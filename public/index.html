@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flood Alert App – Flash Flood Early Warning</title>
+  <meta name="description" content="Real-time flash flood early warning system for coastal and riverside communities." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ─── Header ─────────────────────────────────────────── -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <div class="brand-icon">🌊</div>
+        <div>
+          <h1 class="brand-title">Flood Alert App</h1>
+          <p class="brand-subtitle">Flash Flood Early Warning System</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="status-dot" id="statusDot" title="Connection status"></div>
+        <span class="status-label" id="statusLabel">Connecting…</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── Main Content ────────────────────────────────────── -->
+  <main class="main-container">
+
+    <!-- Notification Card -->
+    <section class="card notify-card">
+      <div class="notify-card-content">
+        <div>
+          <h2 class="card-heading">Stay Informed</h2>
+          <p class="card-description">
+            Enable browser notifications so you'll be alerted even when this
+            tab is in the background or closed.
+          </p>
+        </div>
+        <button class="btn-notify" id="btnNotify" onclick="requestNotificationPermission()">
+          <span class="btn-icon">🔔</span>
+          Enable Notifications
+        </button>
+      </div>
+      <p class="notify-note" id="notifyNote"></p>
+    </section>
+
+    <!-- Alert Panel -->
+    <section id="alertPanel" class="alert-panel hidden" role="alert" aria-live="polite">
+      <div class="alert-header" id="alertHeader">
+        <span class="risk-badge" id="riskBadge">CRITICAL</span>
+        <span class="alert-area" id="alertArea">Negombo</span>
+        <span class="alert-timestamp" id="alertTimestamp"></span>
+      </div>
+      <div class="alert-body">
+        <div class="alert-section">
+          <h3 class="alert-label">⚠️ Condition</h3>
+          <p class="alert-message" id="alertMessage"></p>
+        </div>
+        <div class="alert-section instructions-section">
+          <h3 class="alert-label">✅ What To Do Now</h3>
+          <p class="alert-instructions" id="alertInstructions"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Empty State (shown when no alert exists) -->
+    <section id="emptyState" class="empty-state">
+      <div class="empty-icon">✅</div>
+      <h2 class="empty-title">No flood alerts at the moment</h2>
+      <p class="empty-description">
+        You're safe! This panel will update automatically if a flood
+        warning is issued for your area.
+      </p>
+    </section>
+
+  </main>
+
+  <!-- ─── Footer ─────────────────────────────────────────── -->
+  <footer class="app-footer">
+    <p>Powered by Firebase Cloud Messaging &amp; n8n automation &nbsp;•&nbsp; Data updates in real time</p>
+  </footer>
+
+  <!-- ─── Firebase JS SDK (CDN) ───────────────────────────── -->
+  <!--
+    ✏️  These are loaded from the Firebase CDN.
+        You do NOT need to change anything here —
+        your config goes inside main.js.
+  -->
+  <script type="module" src="main.js"></script>
+
+</body>
+</html>
