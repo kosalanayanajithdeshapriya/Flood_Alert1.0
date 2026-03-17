@@ -98,23 +98,26 @@
 
         <!-- Sensor Data -->
         <div class="sensor-container">
-          <h3 class="dashboard-label">📊 Live Sensor Data</h3>
+          <h3 class="dashboard-label">
+            📊 Live Sensor Data
+            <span class="live-indicator"></span>
+          </h3>
           <div class="sensor-grid">
-            <div class="sensor-card">
+            <div class="sensor-card animate-stagger-1">
               <span class="sensor-icon">💧</span>
               <div class="sensor-info">
                 <span class="sensor-title">Water Level</span>
                 <span class="sensor-value" id="waterLevelVal">--</span>
               </div>
             </div>
-            <div class="sensor-card">
+            <div class="sensor-card animate-stagger-2">
               <span class="sensor-icon">🌊</span>
               <div class="sensor-info">
                 <span class="sensor-title">Flow Rate</span>
                 <span class="sensor-value" id="flowRateVal">--</span>
               </div>
             </div>
-            <div class="sensor-card emergency-card">
+            <div class="sensor-card emergency-card animate-stagger-3">
               <span class="sensor-icon">📞</span>
               <div class="sensor-info">
                 <span class="sensor-title">Emergency Contacts</span>
