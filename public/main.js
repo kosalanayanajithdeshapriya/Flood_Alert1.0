@@ -41,7 +41,7 @@ const VAPID_KEY = "BBJoYYyTSPOb3e2MedXuF99VlmpqHplyYMNWhNE_n6koLOGDjBoEvFR9U2M3L
 //   After you deploy Firebase Functions, paste the URL below:
 //   e.g. "https://us-central1-floodalertweb.cloudfunctions.net"
 // ─────────────────────────────────────────────────────────────
-const BACKEND_URL = "YOUR_CLOUDFUNCTIONS_URL_HERE"; // ✏️ replace
+const BACKEND_URL = "https://registerdevice-vfl42spyfq-uc.a.run.app"; // ✏️ replace
 
 // ─── Risk Level Metadata ──────────────────────────────────────
 const RISK_META = {
