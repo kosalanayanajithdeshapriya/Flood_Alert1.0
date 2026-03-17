@@ -1,0 +1,17 @@
+{
+  "name": "Flood Alert App",
+  "short_name": "Flood Alert",
+  "description": "Real-time Flash Flood Early Warning System.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0a0f1e",
+  "theme_color": "#0a0f1e",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
