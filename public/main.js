@@ -92,7 +92,6 @@ const $statusLabel     = document.getElementById("statusLabel");
 const $dashboardPanel  = document.getElementById("dashboardPanel");
 const $waterLevelVal   = document.getElementById("waterLevelVal");
 const $flowRateVal     = document.getElementById("flowRateVal");
-const $rainfallVal     = document.getElementById("rainfallVal");
 
 // ─── Map Initialization ───────────────────────────────────────
 let map;
@@ -212,12 +211,10 @@ function renderAlert(alert) {
   if (alert.sensor_data) {
     $waterLevelVal.textContent = alert.sensor_data.water_level || "--";
     $flowRateVal.textContent = alert.sensor_data.flow_rate || "--";
-    $rainfallVal.textContent = alert.sensor_data.rainfall || "--";
   } else {
     // Fallback if n8n doesn't send sensor data yet
     $waterLevelVal.textContent = "N/A";
     $flowRateVal.textContent = "N/A";
-    $rainfallVal.textContent = "N/A";
   }
   
   // Update Map

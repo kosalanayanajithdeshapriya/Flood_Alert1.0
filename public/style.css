@@ -502,6 +502,19 @@ body {
   line-height: 1.2;
 }
 
+/* Emergency Contacts Specifics */
+.emergency-card {
+  border-left: 4px solid var(--risk-high);
+}
+
+.emergency-numbers {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--color-text);
+  margin-top: 4px;
+}
+
 /* Leaflet Dark Mode Tweaks */
 .leaflet-container {
   font-family: 'Inter', system-ui, sans-serif !important;
