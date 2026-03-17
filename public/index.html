@@ -8,6 +8,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <!-- Leaflet CSS for Maps -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -79,6 +83,45 @@
       </p>
     </section>
 
+    <!-- Map & Sensor Dashboard (Hidden until data arrives) -->
+    <section id="dashboardPanel" class="dashboard-panel hidden">
+      <div class="dashboard-grid">
+        <!-- Map Container -->
+        <div class="map-container">
+          <h3 class="dashboard-label">📍 Affected Area Map</h3>
+          <div id="map"></div>
+        </div>
+
+        <!-- Sensor Data -->
+        <div class="sensor-container">
+          <h3 class="dashboard-label">📊 Live Sensor Data</h3>
+          <div class="sensor-grid">
+            <div class="sensor-card">
+              <span class="sensor-icon">💧</span>
+              <div class="sensor-info">
+                <span class="sensor-title">Water Level</span>
+                <span class="sensor-value" id="waterLevelVal">--</span>
+              </div>
+            </div>
+            <div class="sensor-card">
+              <span class="sensor-icon">🌊</span>
+              <div class="sensor-info">
+                <span class="sensor-title">Flow Rate</span>
+                <span class="sensor-value" id="flowRateVal">--</span>
+              </div>
+            </div>
+            <div class="sensor-card">
+              <span class="sensor-icon">🌧️</span>
+              <div class="sensor-info">
+                <span class="sensor-title">Rainfall (1h)</span>
+                <span class="sensor-value" id="rainfallVal">--</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- ─── Footer ─────────────────────────────────────────── -->
@@ -93,6 +136,9 @@
         your config goes inside main.js.
   -->
   <script type="module" src="main.js"></script>
+
+  <!-- Leaflet JS for Maps -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 </body>
 </html>

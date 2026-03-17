@@ -55,7 +55,7 @@ exports.receiveAlert = onRequest({ cors: true }, (req, res) => {
       return res.status(405).send("Method Not Allowed");
     }
 
-    const { alert_type, risk_level, message, instructions, timestamp, area } = req.body;
+    const { alert_type, risk_level, message, instructions, timestamp, area, sensor_data } = req.body;
 
     if (!risk_level || !message) {
       return res.status(400).json({ error: "Missing required fields: risk_level and message." });
@@ -69,6 +69,7 @@ exports.receiveAlert = onRequest({ cors: true }, (req, res) => {
     instructions: instructions || "Stay calm and follow local authority guidance.",
     timestamp: timestamp || new Date().toISOString(),
     area: area || "Unknown area",
+    sensor_data: sensor_data || null,
     receivedAt: admin.firestore.FieldValue.serverTimestamp()
   };
 

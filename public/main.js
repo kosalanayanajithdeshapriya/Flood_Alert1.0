@@ -88,6 +88,79 @@ const $notifyNote      = document.getElementById("notifyNote");
 const $statusDot       = document.getElementById("statusDot");
 const $statusLabel     = document.getElementById("statusLabel");
 
+// Dashboard Elements
+const $dashboardPanel  = document.getElementById("dashboardPanel");
+const $waterLevelVal   = document.getElementById("waterLevelVal");
+const $flowRateVal     = document.getElementById("flowRateVal");
+const $rainfallVal     = document.getElementById("rainfallVal");
+
+// ─── Map Initialization ───────────────────────────────────────
+let map;
+let mapMarker;
+
+function initMap() {
+  if (map) return; // Already initialized
+  // Default to Sri Lanka coordinates
+  map = L.map('map').setView([7.8731, 80.7718], 7);
+  
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 20
+  }).addTo(map);
+}
+
+/**
+ * Uses free OpenStreetMap Nominatim API to get coordinates from a city/area name
+ */
+async function geocodeLocation(areaName) {
+  try {
+    // Add "Sri Lanka" to improve search accuracy, adjust if your system is deployed elsewhere
+    const query = encodeURIComponent(`${areaName}, Sri Lanka`);
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1`);
+    const data = await res.json();
+    
+    if (data && data.length > 0) {
+      return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+    }
+  } catch (e) {
+    console.error("Geocoding failed:", e);
+  }
+  return null;
+}
+
+function updateMap(lat, lon, riskLevel, areaName) {
+  if (!map) initMap();
+  
+  const coords = [lat, lon];
+  map.setView(coords, 12); // Zoom in to the area
+  
+  // Custom marker colors based on risk
+  let markerColor = "#22c55e"; // low
+  if (riskLevel === "CRITICAL") markerColor = "#ef4444";
+  else if (riskLevel === "HIGH") markerColor = "#f97316";
+  else if (riskLevel === "MEDIUM") markerColor = "#eab308";
+
+  const customIcon = L.divIcon({
+    className: 'custom-map-marker',
+    html: `<div style="background-color: ${markerColor}; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px ${markerColor};"></div>`,
+    iconSize: [20, 20],
+    iconAnchor: [10, 10]
+  });
+
+  if (mapMarker) {
+    mapMarker.setLatLng(coords);
+    mapMarker.setIcon(customIcon);
+  } else {
+    mapMarker = L.marker(coords, { icon: customIcon }).addTo(map);
+  }
+  
+  mapMarker.bindPopup(`<b>${areaName}</b><br>Risk: ${riskLevel}`).openPopup();
+  
+  // Force map to recalculate boundaries if container resized
+  setTimeout(() => map.invalidateSize(), 300);
+}
+
 // ─── Render Alert ─────────────────────────────────────────────
 /**
  * Renders an alert payload into the alert panel.
@@ -134,6 +207,33 @@ function renderAlert(alert) {
   requestAnimationFrame(() => {
     $alertPanel.style.animation = "";
   });
+  
+  // Update Sensor Data
+  if (alert.sensor_data) {
+    $waterLevelVal.textContent = alert.sensor_data.water_level || "--";
+    $flowRateVal.textContent = alert.sensor_data.flow_rate || "--";
+    $rainfallVal.textContent = alert.sensor_data.rainfall || "--";
+  } else {
+    // Fallback if n8n doesn't send sensor data yet
+    $waterLevelVal.textContent = "N/A";
+    $flowRateVal.textContent = "N/A";
+    $rainfallVal.textContent = "N/A";
+  }
+  
+  // Update Map
+  $dashboardPanel.classList.remove("hidden");
+  
+  // Initialize map if it hasn't been yet, just to show it while geocoding
+  initMap();
+  setTimeout(() => map.invalidateSize(), 100);
+
+  if (alert.area && alert.area !== "Unknown area") {
+    geocodeLocation(alert.area).then(coords => {
+      if (coords) {
+        updateMap(coords.lat, coords.lon, risk, alert.area);
+      }
+    });
+  }
 }
 
 // ─── Firestore – Real-time in-app updates ────────────────────
