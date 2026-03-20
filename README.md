@@ -9,6 +9,10 @@ This application is built with a **Serverless** architecture to be hosted on Ver
 
 ## Architecture
 
+#circuit Diagrame
+![WhatsApp Image 2026-03-20 at 10 26 08 AM](https://github.com/user-attachments/assets/a31e7af8-abe5-4ede-afad-0e18eed4272d)
+
+
 ```
 n8n HTTP Request Node
         │  POST /receiveAlert (Firebase Function)
@@ -62,14 +66,16 @@ n8n HTTP Request Node
 ---
 
 ## 🔗 Connecting n8n
+<img width="1230" height="741" alt="image" src="https://github.com/user-attachments/assets/9ce8f445-c306-47ed-80ee-e08d8d9bca7c" />
+
 In your n8n workflow, add an **HTTP Request** node configured as:
 
-| Setting       | Value                                          |
-|---------------|------------------------------------------------|
-| Method        | `POST`                                         |
-| URL           | `https://YOUR_FUNCTION_URL/receiveAlert`       |
-| Body Type     | `JSON`                                         |
-| Content-Type  | `application/json`                             |
+| Setting       | Value                                                              |
+|---------------|--------------------------------------------------------------------|
+| Method        | `POST`                                                             |
+| URL           | `https://us-central1-floodalertweb.cloudfunctions.net/receiveAlert`|
+| Body Type     | `JSON`                                                             |
+| Content-Type  | `application/json`                                                 |
 
 **JSON Body to send from n8n:**
 ```json
