@@ -1,4 +1,5 @@
 # 🌊 Flood Alert App (Vercel + Firebase)
+<img width="1093" height="899" alt="image" src="https://github.com/user-attachments/assets/184d75b7-ef74-4d12-a38a-32a2ecc38d2f" />
 
 A real-time **Flash Flood Early Warning System** — push notifications via Firebase Cloud Messaging + live in-app updates via **Cloud Firestore**, triggered by your n8n workflow.
 
