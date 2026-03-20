@@ -62,14 +62,16 @@ n8n HTTP Request Node
 ---
 
 ## 🔗 Connecting n8n
+<img width="1230" height="741" alt="image" src="https://github.com/user-attachments/assets/9ce8f445-c306-47ed-80ee-e08d8d9bca7c" />
+
 In your n8n workflow, add an **HTTP Request** node configured as:
 
-| Setting       | Value                                          |
-|---------------|------------------------------------------------|
-| Method        | `POST`                                         |
-| URL           | `https://YOUR_FUNCTION_URL/receiveAlert`       |
-| Body Type     | `JSON`                                         |
-| Content-Type  | `application/json`                             |
+| Setting       | Value                                                              |
+|---------------|--------------------------------------------------------------------|
+| Method        | `POST`                                                             |
+| URL           | `https://us-central1-floodalertweb.cloudfunctions.net/receiveAlert`|
+| Body Type     | `JSON`                                                             |
+| Content-Type  | `application/json`                                                 |
 
 **JSON Body to send from n8n:**
 ```json
