@@ -9,6 +9,10 @@ This application is built with a **Serverless** architecture to be hosted on Ver
 
 ## Architecture
 
+#circuit Diagrame
+![WhatsApp Image 2026-03-20 at 10 26 08 AM](https://github.com/user-attachments/assets/a31e7af8-abe5-4ede-afad-0e18eed4272d)
+
+
 ```
 n8n HTTP Request Node
         │  POST /receiveAlert (Firebase Function)
