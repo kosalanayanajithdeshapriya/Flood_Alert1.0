@@ -150,6 +150,36 @@
         You do NOT need to change anything here —
         your config goes inside main.js.
   -->
+  <!-- ─── AI Chatbot UI ────────────────────────────────────── -->
+  <button class="chat-fab" id="chatFab" onclick="toggleChat()" title="Ask our AI Assistant">
+    <span class="fab-icon">🤖</span>
+    <span class="fab-badge"></span>
+  </button>
+
+  <div class="chat-window hidden" id="chatWindow">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <span class="chat-header-icon">🤖</span>
+        <div>
+          <h4 class="chat-header-title">AI Assistant</h4>
+          <span class="chat-header-status">Online • Weather Expert</span>
+        </div>
+      </div>
+      <button class="chat-close" onclick="toggleChat()">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="message assistant">
+        Hi there! I'm your AI weather assistant. Need help with the latest weather developments or flood risks? Just ask!
+      </div>
+    </div>
+    <div class="chat-input-container">
+      <input type="text" id="chatInput" placeholder="Type a message..." autocomplete="off">
+      <button class="chat-send" id="chatSend" onclick="sendMessage()">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+
   <script type="module" src="main.js"></script>
 
   <!-- Leaflet JS for Maps -->

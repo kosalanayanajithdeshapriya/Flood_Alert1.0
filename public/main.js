@@ -297,4 +297,68 @@ function resetBtn() {
 }
 
 // ─── Boot ─────────────────────────────────────────────────
+// ─── AI Chatbot Logic ─────────────────────────────────────
+const $chatFab = document.getElementById("chatFab");
+const $chatWindow = document.getElementById("chatWindow");
+const $chatMessages = document.getElementById("chatMessages");
+const $chatInput = document.getElementById("chatInput");
+
+let chatHistory = [
+  { role: "assistant", content: "Hi there! I'm your AI weather assistant. Need help with the latest weather developments or flood risks? Just ask!" }
+];
+
+window.toggleChat = function() {
+  if (!$chatWindow) return;
+  $chatWindow.classList.toggle("hidden");
+  if (!$chatWindow.classList.contains("hidden")) {
+    $chatInput.focus();
+  }
+};
+
+window.sendMessage = async function() {
+  const text = $chatInput.value.trim();
+  if (!text || !$chatInput) return;
+
+  addMessage("user", text);
+  $chatInput.value = "";
+  chatHistory.push({ role: "user", content: text });
+
+  const $loadingMsg = addMessage("assistant loading", "AI is thinking...");
+
+  try {
+    const CHAT_API_URL = "https://chat-vfl42spyfq-uc.a.run.app"; 
+    const response = await fetch(CHAT_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: chatHistory })
+    });
+    if (!response.ok) throw new Error("Chat API failed");
+    const data = await response.json();
+    $loadingMsg.remove();
+    addMessage("assistant", data.response);
+    chatHistory.push({ role: "assistant", content: data.response });
+  } catch (error) {
+    console.error("Chat error:", error);
+    if ($loadingMsg) {
+      $loadingMsg.textContent = "Sorry, I'm having trouble connecting to my brain. Please check your internet or try again later.";
+      $loadingMsg.classList.remove("loading");
+    }
+  }
+};
+
+function addMessage(role, text) {
+  const $msg = document.createElement("div");
+  $msg.className = `message ${role}`;
+  $msg.textContent = text;
+  $chatMessages.appendChild($msg);
+  $chatMessages.scrollTop = $chatMessages.scrollHeight;
+  return $msg;
+}
+
+if ($chatInput) {
+  $chatInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") window.sendMessage();
+  });
+}
+
 connectFirestoreAlerts();
