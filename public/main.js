@@ -332,9 +332,7 @@ const $chatMessages = document.getElementById("chatMessages");
 const $chatInput = document.getElementById("chatInput");
 
 
-let chatHistory = [
-  { role: "assistant", content: "Hi there! I'm your AI weather assistant. Need help with the latest weather developments or flood risks? Just ask!" }
-];
+let chatHistory = [];
 
 
 window.toggleChat = function () {
