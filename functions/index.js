@@ -38,7 +38,7 @@ exports.registerDevice = onRequest({ cors: true }, async (req, res) => {
 
 // ─── Constants & API Keys ──────────────────────────────────
 const WEATHER_API_KEY = "bc2641ed7eb2c4764c409d838400382b";
-const GEMINI_API_KEY = "AIzaSyCnzKu7lqGgTMsjeKO_Eudn-GbKkH5HKfw";
+const GEMINI_API_KEY = "AIzaSyCXpFrz9KUoegDaXv6gXT96-kcFyIImrvY";
 
 /**
  * Helper: Fetch real-time weather from OpenWeatherMap

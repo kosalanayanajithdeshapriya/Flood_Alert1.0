@@ -1,0 +1,92 @@
+﻿2026-03-23T10:35:08.216932073Z N chat: {"@type":"type.googleapis.com/google.cloud.audit.AuditLog","status":{},"authenticationInfo":{"principalEmail":"deshapriyakosala@gmail.com","principalSubject":"user:deshapriyakosala@gmail.com","oauthInfo":{"oauthClientId":"563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com"}},"requestMetadata":{"callerIp":"45.121.88.242","callerSuppliedUserAgent":"FirebaseCLI/14.26.0,gzip(gfe),gzip(gfe)","requestAttributes":{"time":"2026-03-23T10:35:07.592013975Z","auth":{}},"destinationAttributes":{}},"serviceName":"cloudfunctions.googleapis.com","methodName":"google.cloud.functions.v2.FunctionService.CreateFunction","authorizationInfo":[{"resource":"projects/floodalertweb/locations/us-central1/functions/chat","permission":"cloudfunctions.functions.create","granted":true,"resourceAttributes":{"service":"cloudfunctions.googleapis.com","name":"projects/floodalertweb/locations/us-central1/functions/chat","type":"cloudfunctions.googleapis.com/Function"},"permissionType":"ADMIN_WRITE"}],"resourceName":"projects/floodalertweb/locations/us-central1/functions/chat","request":{"@type":"type.googleapis.com/google.cloud.functions.v2.CreateFunctionRequest","function":{"build_config":{"source":{},"entry_point":"chat","runtime":"nodejs20"},"name":"projects/floodalertweb/locations/us-central1/functions/chat","labels":{"firebase-functions-hash":"c1d57d078eab9f52ee303c8aa39f479e450dae1c","deployment-tool":"cli-firebase"},"service_config":{"max_instance_request_concurrency":80,"available_memory":"256Mi","available_cpu":"1"}},"parent":"projects/floodalertweb/locations/us-central1"},"response":{"@type":"type.googleapis.com/google.longrunning.Operation"},"resourceLocation":{"currentLocations":["us-central1"]}}
+2026-03-23T10:36:14.725681Z I chat: Starting new instance. Reason: DEPLOYMENT_ROLLOUT - Instance started due to traffic shifting between revisions due to deployment, traffic split adjustment, or deployment health check.
+2026-03-23T10:36:16.773655Z I chat: Default STARTUP TCP probe succeeded after 1 attempt for container "worker" on port 8080.
+2026-03-23T10:36:18.511269670Z N chat: {"@type":"type.googleapis.com/google.cloud.audit.AuditLog","status":{},"authenticationInfo":{"principalEmail":"deshapriyakosala@gmail.com","principalSubject":"user:deshapriyakosala@gmail.com","oauthInfo":{"oauthClientId":"563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com"}},"requestMetadata":{"requestAttributes":{},"destinationAttributes":{}},"serviceName":"cloudfunctions.googleapis.com","methodName":"google.cloud.functions.v2.FunctionService.CreateFunction","resourceName":"projects/floodalertweb/locations/us-central1/functions/chat","response":{"buildConfig":{"entryPoint":"chat","dockerRegistry":"ARTIFACT_REGISTRY","runtime":"nodejs20","source":{},"serviceAccount":"projects/floodalertweb/serviceAccounts/424330044822-compute@developer.gserviceaccount.com","automaticUpdatePolicy":{},"dockerRepository":"projects/floodalertweb/locations/us-central1/repositories/gcf-artifacts"},"name":"projects/floodalertweb/locations/us-central1/functions/chat","labels":{"firebase-functions-hash":"c1d57d078eab9f52ee303c8aa39f479e450dae1c","deployment-tool":"cli-firebase"},"state":"ACTIVE","url":"https://us-central1-floodalertweb.cloudfunctions.net/chat","@type":"type.googleapis.com/google.cloud.functions.v2.Function","satisfiesPzi":true,"environment":"GEN_2","updateTime":"2026-03-23T10:35:08.195117479Z","serviceConfig":{"availableCpu":"1","uri":"https://chat-vfl42spyfq-uc.a.run.app","ingressSettings":"ALLOW_ALL","maxInstanceRequestConcurrency":80,"allTrafficOnLatestRevision":true,"revision":"chat-00001-jaf","timeoutSeconds":60,"serviceAccountEmail":"424330044822-compute@developer.gserviceaccount.com","availableMemory":"256Mi"},"createTime":"2026-03-23T10:35:08.195117479Z"},"resourceLocation":{"currentLocations":["us-central1"]}}
+2026-03-23T12:21:55.204365Z I chat: 
+2026-03-23T12:21:55.240927Z I chat: Starting new instance. Reason: AUTOSCALING - Instance started due to configured scaling factors (e.g. CPU utilization, request throughput, etc.) or no existing capacity for current traffic.
+2026-03-23T12:21:56.339355Z I chat: Default STARTUP TCP probe succeeded after 1 attempt for container "worker" on port 8080.
+2026-03-23T12:21:56.836644Z E chat: 
+2026-03-23T12:21:56.867624Z ? chat: Chatbot Error: GoogleGenerativeAIError: [GoogleGenerativeAI Error]: First content should be with role 'user', got model
+    at validateChatHistory (/workspace/node_modules/@google/generative-ai/dist/index.js:1017:19)
+    at new ChatSession (/workspace/node_modules/@google/generative-ai/dist/index.js:1089:13)
+    at GenerativeModel.startChat (/workspace/node_modules/@google/generative-ai/dist/index.js:1337:16)
+    at /workspace/index.js:106:24
+    at /workspace/node_modules/firebase-functions/lib/v2/providers/https.js:89:29
+    at cors (/workspace/node_modules/cors/lib/index.js:188:7)
+    at /workspace/node_modules/cors/lib/index.js:224:17
+    at originCallback (/workspace/node_modules/cors/lib/index.js:214:15)
+    at /workspace/node_modules/cors/lib/index.js:219:13
+    at optionsCallback (/workspace/node_modules/cors/lib/index.js:199:9)
+
+2026-03-23T12:22:14.264498Z I chat: 
+2026-03-23T12:22:14.666500Z E chat: 
+2026-03-23T12:22:14.672799Z ? chat: Chatbot Error: GoogleGenerativeAIError: [GoogleGenerativeAI Error]: First content should be with role 'user', got model
+    at validateChatHistory (/workspace/node_modules/@google/generative-ai/dist/index.js:1017:19)
+    at new ChatSession (/workspace/node_modules/@google/generative-ai/dist/index.js:1089:13)
+    at GenerativeModel.startChat (/workspace/node_modules/@google/generative-ai/dist/index.js:1337:16)
+    at /workspace/index.js:106:24
+    at /workspace/node_modules/firebase-functions/lib/v2/providers/https.js:89:29
+    at cors (/workspace/node_modules/cors/lib/index.js:188:7)
+    at /workspace/node_modules/cors/lib/index.js:224:17
+    at originCallback (/workspace/node_modules/cors/lib/index.js:214:15)
+    at /workspace/node_modules/cors/lib/index.js:219:13
+    at optionsCallback (/workspace/node_modules/cors/lib/index.js:199:9)
+
+2026-03-23T12:22:32.335067Z I chat: 
+2026-03-23T12:22:32.784503Z E chat: 
+2026-03-23T12:22:32.791040Z ? chat: Chatbot Error: GoogleGenerativeAIError: [GoogleGenerativeAI Error]: First content should be with role 'user', got model
+    at validateChatHistory (/workspace/node_modules/@google/generative-ai/dist/index.js:1017:19)
+    at new ChatSession (/workspace/node_modules/@google/generative-ai/dist/index.js:1089:13)
+    at GenerativeModel.startChat (/workspace/node_modules/@google/generative-ai/dist/index.js:1337:16)
+    at /workspace/index.js:106:24
+    at /workspace/node_modules/firebase-functions/lib/v2/providers/https.js:89:29
+    at cors (/workspace/node_modules/cors/lib/index.js:188:7)
+    at /workspace/node_modules/cors/lib/index.js:224:17
+    at originCallback (/workspace/node_modules/cors/lib/index.js:214:15)
+    at /workspace/node_modules/cors/lib/index.js:219:13
+    at optionsCallback (/workspace/node_modules/cors/lib/index.js:199:9)
+
+2026-03-23T12:45:38.530542Z I chat: 
+2026-03-23T12:45:38.545906Z I chat: Starting new instance. Reason: AUTOSCALING - Instance started due to configured scaling factors (e.g. CPU utilization, request throughput, etc.) or no existing capacity for current traffic.
+2026-03-23T12:45:39.633512Z I chat: Default STARTUP TCP probe succeeded after 1 attempt for container "worker" on port 8080.
+2026-03-23T12:45:40.495006Z E chat: 
+2026-03-23T12:45:40.519082Z ? chat: Chatbot Error: GoogleGenerativeAIError: [GoogleGenerativeAI Error]: First content should be with role 'user', got model
+    at validateChatHistory (/workspace/node_modules/@google/generative-ai/dist/index.js:1017:19)
+    at new ChatSession (/workspace/node_modules/@google/generative-ai/dist/index.js:1089:13)
+    at GenerativeModel.startChat (/workspace/node_modules/@google/generative-ai/dist/index.js:1337:16)
+    at /workspace/index.js:106:24
+    at /workspace/node_modules/firebase-functions/lib/v2/providers/https.js:89:29
+    at cors (/workspace/node_modules/cors/lib/index.js:188:7)
+    at /workspace/node_modules/cors/lib/index.js:224:17
+    at originCallback (/workspace/node_modules/cors/lib/index.js:214:15)
+    at /workspace/node_modules/cors/lib/index.js:219:13
+    at optionsCallback (/workspace/node_modules/cors/lib/index.js:199:9)
+
+2026-03-23T12:47:23.477943Z I chat: 
+2026-03-23T12:47:23.884356Z E chat: 
+2026-03-23T12:47:24.123173Z ? chat: Chatbot Error: GoogleGenerativeAIFetchError: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [403 Forbidden] Your API key was reported as leaked. Please use another API key.
+    at handleResponseNotOk (/workspace/node_modules/@google/generative-ai/dist/index.js:414:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async makeRequest (/workspace/node_modules/@google/generative-ai/dist/index.js:387:9)
+    at async generateContent (/workspace/node_modules/@google/generative-ai/dist/index.js:832:22)
+    at async ChatSession.sendMessage (/workspace/node_modules/@google/generative-ai/dist/index.js:1146:9)
+    at async /workspace/index.js:114:20 {
+  status: 403,
+  statusText: 'Forbidden',
+  errorDetails: undefined
+}
+
+2026-03-23T12:48:14.673038Z I chat: 
+2026-03-23T12:48:15.256060Z E chat: 
+2026-03-23T12:48:15.342027Z ? chat: Chatbot Error: GoogleGenerativeAIFetchError: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [403 Forbidden] Your API key was reported as leaked. Please use another API key.
+    at handleResponseNotOk (/workspace/node_modules/@google/generative-ai/dist/index.js:414:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async makeRequest (/workspace/node_modules/@google/generative-ai/dist/index.js:387:9)
+    at async generateContent (/workspace/node_modules/@google/generative-ai/dist/index.js:832:22)
+    at async ChatSession.sendMessage (/workspace/node_modules/@google/generative-ai/dist/index.js:1146:9)
+    at async /workspace/index.js:114:20 {
+  status: 403,
+  statusText: 'Forbidden',
+  errorDetails: undefined
+}
+
