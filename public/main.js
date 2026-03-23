@@ -3,6 +3,7 @@
 //  Firebase JS SDK v10 (modular) + Firestore real-time updates
 // ============================================================
 
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getMessaging,
@@ -15,6 +16,7 @@ import {
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+
 const firebaseConfig = {
   apiKey: "AIzaSyBt9GtXJn1s3fn9s3JHj4YuQq5cjVBHzDY",
   authDomain: "floodalertweb.firebaseapp.com",
@@ -25,11 +27,12 @@ const firebaseConfig = {
   measurementId: "G-MVGEWY7LJN"
 };
 
+
 const VAPID_KEY = "BBJoYYyTSPOb3e2MedXuF99VlmpqHplyYMNWhNE_n6koLOGDjBoEvFR9U2M3LQM3PheI-P__mZRxgnW-LZmGGMs";
 const BACKEND_URL = "https://registerdevice-vfl42spyfq-uc.a.run.app";
 
+
 // ─── Risk Level Metadata ──────────────────────────────────
-// Only CRITICAL, WARNING, SAFE — matches ESP32 ML model output
 const RISK_META = {
   CRITICAL: {
     label: "CRITICAL – Evacuate now",
@@ -45,16 +48,19 @@ const RISK_META = {
   },
 };
 
+
 // ─── Firebase Init ────────────────────────────────────────
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 let messaging;
+
 
 try {
   messaging = getMessaging(app);
 } catch (e) {
   console.warn("Firebase Messaging not available:", e.message);
 }
+
 
 // ─── DOM Elements ─────────────────────────────────────────
 const $alertPanel = document.getElementById("alertPanel");
@@ -73,9 +79,11 @@ const $dashboardPanel = document.getElementById("dashboardPanel");
 const $waterLevelVal = document.getElementById("waterLevelVal");
 const $flowRateVal = document.getElementById("flowRateVal");
 
+
 // ─── Map ──────────────────────────────────────────────────
 let map;
 let mapMarker;
+
 
 function initMap() {
   if (map) return;
@@ -86,6 +94,7 @@ function initMap() {
     maxZoom: 20
   }).addTo(map);
 }
+
 
 async function geocodeLocation(areaName) {
   try {
@@ -101,14 +110,17 @@ async function geocodeLocation(areaName) {
   return null;
 }
 
+
 function updateMap(lat, lon, riskLevel, areaName) {
   if (!map) initMap();
   const coords = [lat, lon];
   map.setView(coords, 12);
 
-  let markerColor = "#22c55e"; // SAFE default
+
+  let markerColor = "#22c55e"; // SAFE = green
   if (riskLevel === "CRITICAL") markerColor = "#ef4444";
   else if (riskLevel === "WARNING") markerColor = "#f97316";
+
 
   const customIcon = L.divIcon({
     className: 'custom-map-marker',
@@ -117,6 +129,7 @@ function updateMap(lat, lon, riskLevel, areaName) {
     iconAnchor: [10, 10]
   });
 
+
   if (mapMarker) {
     mapMarker.setLatLng(coords);
     mapMarker.setIcon(customIcon);
@@ -124,40 +137,21 @@ function updateMap(lat, lon, riskLevel, areaName) {
     mapMarker = L.marker(coords, { icon: customIcon }).addTo(map);
   }
 
+
   mapMarker.bindPopup(`<b>${areaName}</b><br>Risk: ${riskLevel}`).openPopup();
   setTimeout(() => map.invalidateSize(), 300);
 }
 
-// ─── Render Alert ─────────────────────────────────────────
-function renderAlert(alert) {
-  if (!alert) return;
 
-  const risk = (alert.risk_level || "SAFE").toUpperCase();
-  const meta = RISK_META[risk] || RISK_META.SAFE;
-
-  // ✅ SAFE — hide alert panel, show green empty state
-  if (risk === "SAFE") {
-    $alertPanel.classList.add("hidden");
-    $dashboardPanel.classList.add("hidden");
-    $emptyState.classList.remove("hidden");
-    return;
-  }
-
-  // CRITICAL or WARNING — show alert panel
-  $emptyState.classList.add("hidden");
-  $alertPanel.classList.remove("hidden");
-  $dashboardPanel.classList.remove("hidden");
-
-  // Apply risk CSS class to panel
+// ─── Shared Render Helper ─────────────────────────────────
+function populateAlertPanel(alert, risk, meta) {
   $alertPanel.className = "alert-panel " + meta.cssClass;
-
-  // Badge and content
   $riskBadge.textContent = meta.label;
   $alertArea.textContent = alert.area || "Unknown area";
   $alertMessage.textContent = alert.message || "No further details available.";
   $alertInstructions.textContent = alert.instructions || "Follow guidance from local authorities.";
 
-  // Timestamp
+
   if (alert.timestamp) {
     const date = new Date(alert.timestamp);
     $alertTimestamp.textContent = isNaN(date)
@@ -167,15 +161,15 @@ function renderAlert(alert) {
     $alertTimestamp.textContent = "";
   }
 
-  // Re-trigger slide animation on update
+
   $alertPanel.style.animation = "none";
   requestAnimationFrame(() => { $alertPanel.style.animation = ""; });
 
-  // Sensor values — supports both flat and nested formats
+
   $waterLevelVal.textContent = alert.water_level || alert.sensor_data?.water_level || "N/A";
   $flowRateVal.textContent = alert.flow_rate || alert.sensor_data?.flow_rate || "N/A";
 
-  // Map
+
   initMap();
   setTimeout(() => map.invalidateSize(), 100);
   if (alert.area && alert.area !== "Unknown area") {
@@ -185,10 +179,31 @@ function renderAlert(alert) {
   }
 }
 
+
+// ─── Render Alert ─────────────────────────────────────────
+function renderAlert(alert) {
+  if (!alert) return;
+
+
+  const risk = (alert.risk_level || "SAFE").toUpperCase();
+  const meta = RISK_META[risk] || RISK_META.SAFE;
+
+
+  // ALL risk levels now show the alert panel
+  $emptyState.classList.add("hidden");
+  $alertPanel.classList.remove("hidden");
+  $dashboardPanel.classList.remove("hidden");
+
+
+  populateAlertPanel(alert, risk, meta);
+}
+
+
 // ─── Firestore Listener ───────────────────────────────────
 function connectFirestoreAlerts() {
   setStatus("connected", "Connecting...");
   const alertDocRef = doc(db, "alerts", "latest");
+
 
   onSnapshot(
     alertDocRef,
@@ -198,7 +213,6 @@ function connectFirestoreAlerts() {
         renderAlert(docSnap.data());
       } else {
         setStatus("connected", "No alerts");
-        // No document yet — show safe/empty state
         $alertPanel.classList.add("hidden");
         $dashboardPanel.classList.add("hidden");
         $emptyState.classList.remove("hidden");
@@ -211,10 +225,12 @@ function connectFirestoreAlerts() {
   );
 }
 
+
 function setStatus(state, label) {
   $statusDot.className = "status-dot " + state;
   $statusLabel.textContent = label;
 }
+
 
 // ─── FCM Foreground Messages ──────────────────────────────
 if (messaging) {
@@ -234,6 +250,7 @@ if (messaging) {
   });
 }
 
+
 // ─── Notification Permission ──────────────────────────────
 window.requestNotificationPermission = async function () {
   if (!messaging) {
@@ -241,12 +258,15 @@ window.requestNotificationPermission = async function () {
     return;
   }
 
+
   $btnNotify.disabled = true;
   $btnNotify.textContent = "Requesting permission…";
+
 
   try {
     const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
     console.log("✅ Service worker registered:", registration.scope);
+
 
     const permission = await Notification.requestPermission();
     if (permission !== "granted") {
@@ -255,10 +275,12 @@ window.requestNotificationPermission = async function () {
       return;
     }
 
+
     const token = await getToken(messaging, {
       vapidKey: VAPID_KEY,
       serviceWorkerRegistration: registration,
     });
+
 
     if (!token) {
       showNotifyNote("⚠️ Could not retrieve notification token.", "error");
@@ -266,7 +288,9 @@ window.requestNotificationPermission = async function () {
       return;
     }
 
+
     console.log("📲 FCM Token:", token);
+
 
     const res = await fetch(`${BACKEND_URL}/registerDevice`, {
       method: "POST",
@@ -274,7 +298,9 @@ window.requestNotificationPermission = async function () {
       body: JSON.stringify({ token }),
     });
 
+
     if (!res.ok) throw new Error("Backend registration failed");
+
 
     showNotifyNote("✅ Notifications enabled! You're all set.", "success");
     $btnNotify.textContent = "✔ Notifications Enabled";
@@ -286,28 +312,32 @@ window.requestNotificationPermission = async function () {
   }
 };
 
+
 function showNotifyNote(msg, type) {
   $notifyNote.textContent = msg;
   $notifyNote.className = "notify-note " + (type || "");
 }
+
 
 function resetBtn() {
   $btnNotify.disabled = false;
   $btnNotify.innerHTML = '<span class="btn-icon">🔔</span> Enable Notifications';
 }
 
-// ─── Boot ─────────────────────────────────────────────────
+
 // ─── AI Chatbot Logic ─────────────────────────────────────
 const $chatFab = document.getElementById("chatFab");
 const $chatWindow = document.getElementById("chatWindow");
 const $chatMessages = document.getElementById("chatMessages");
 const $chatInput = document.getElementById("chatInput");
 
+
 let chatHistory = [
   { role: "assistant", content: "Hi there! I'm your AI weather assistant. Need help with the latest weather developments or flood risks? Just ask!" }
 ];
 
-window.toggleChat = function() {
+
+window.toggleChat = function () {
   if (!$chatWindow) return;
   $chatWindow.classList.toggle("hidden");
   if (!$chatWindow.classList.contains("hidden")) {
@@ -315,18 +345,22 @@ window.toggleChat = function() {
   }
 };
 
-window.sendMessage = async function() {
+
+window.sendMessage = async function () {
   const text = $chatInput.value.trim();
   if (!text || !$chatInput) return;
+
 
   addMessage("user", text);
   $chatInput.value = "";
   chatHistory.push({ role: "user", content: text });
 
+
   const $loadingMsg = addMessage("assistant loading", "AI is thinking...");
 
+
   try {
-    const CHAT_API_URL = "https://chat-vfl42spyfq-uc.a.run.app"; 
+    const CHAT_API_URL = "https://chat-vfl42spyfq-uc.a.run.app";
     const response = await fetch(CHAT_API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -346,6 +380,7 @@ window.sendMessage = async function() {
   }
 };
 
+
 function addMessage(role, text) {
   const $msg = document.createElement("div");
   $msg.className = `message ${role}`;
@@ -355,10 +390,13 @@ function addMessage(role, text) {
   return $msg;
 }
 
+
 if ($chatInput) {
   $chatInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") window.sendMessage();
   });
 }
 
+
+// ─── Boot ─────────────────────────────────────────────────
 connectFirestoreAlerts();
