@@ -14,8 +14,6 @@ const messaging = admin.messaging();
 
 /**
  * HTTP POST /registerDevice
- * Receives FCM token from the Vercel frontend and saves it to Firestore.
- * Body: { token: "FCM_TOKEN_STRING" }
  */
 exports.registerDevice = onRequest({ cors: true }, (req, res) => {
   return cors(req, res, async () => {
@@ -29,12 +27,9 @@ exports.registerDevice = onRequest({ cors: true }, (req, res) => {
     }
 
     try {
-      // Save token to Firestore /tokens collection
-      // Using the token itself as the document ID ensures no duplicates
       await db.collection("tokens").doc(token).set({
         registeredAt: admin.firestore.FieldValue.serverTimestamp()
       });
-      
       console.log(`📲 New device registered in Firestore.`);
       res.json({ success: true, message: "Device registered for notifications." });
     } catch (error) {
@@ -45,7 +40,6 @@ exports.registerDevice = onRequest({ cors: true }, (req, res) => {
 });
 
 // ─── Constants & API Keys ──────────────────────────────────
-// ⚠️ WARNING: In production, use Firebase Secrets or environment variables!
 const WEATHER_API_KEY = "bc2641ed7eb2c4764c409d838400382b";
 const GEMINI_API_KEY = "AIzaSyCnzKu7lqGgTMsjeKO_Eudn-GbKkH5HKfw";
 
@@ -74,8 +68,6 @@ async function get_weather_data(city) {
 
 /**
  * HTTP POST /chat
- * AI Chatbot powered by Gemini Flash 2.0.
- * Supports weather queries via function calling (manual implementation for simplicity).
  */
 exports.chat = onRequest({ cors: true }, (req, res) => {
   return cors(req, res, async () => {
@@ -90,32 +82,29 @@ exports.chat = onRequest({ cors: true }, (req, res) => {
 
     try {
       if (GEMINI_API_KEY === "YOUR_GEMINI_API_KEY") {
-        return res.json({ 
-          response: "The AI Chatbot is almost ready! Please set your GEMINI_API_KEY in the backend to start chatting. You can get one for free at https://aistudio.google.com/" 
+        return res.json({
+          response: "The AI Chatbot is almost ready! Please set your GEMINI_API_KEY in the backend to start chatting."
         });
       }
 
       const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-      const model = genAI.getGenerativeModel({ 
+      const model = genAI.getGenerativeModel({
         model: "gemini-2.0-flash",
         systemInstruction: "You are a helpful assistant for the Flood Alert App. You provide real-time weather news and details. Be concise, professional, and empathetic, especially when discussing flood risks."
       });
 
-      // Simple implementation: check if user is asking for weather
       const lastMessage = messages[messages.length - 1].content.toLowerCase();
       let contextAddition = "";
 
       if (lastMessage.includes("weather") || lastMessage.includes("temperature") || lastMessage.includes("condition")) {
-          // Attempt to extract city - if not found, assume default or ask
-          const cityMatch = lastMessage.match(/(?:in|for|at)\s+([a-zA-Z\s,]+)/i);
-          const city = cityMatch ? cityMatch[1].trim() : "Negombo"; // Default to Negombo as seen in frontend
-          
-          const weather = await get_weather_data(city);
-          if (!weather.error) {
-              contextAddition = `\n[Real-time Weather for ${weather.location}: ${weather.condition}, ${weather.temperature}, Humidity ${weather.humidity}, Wind ${weather.wind}]`;
-          } else {
-              contextAddition = `\n[Note: I tried to fetch weather data but couldn't find details for "${city}".]`;
-          }
+        const cityMatch = lastMessage.match(/(?:in|for|at)\s+([a-zA-Z\s,]+)/i);
+        const city = cityMatch ? cityMatch[1].trim() : "Negombo";
+        const weather = await get_weather_data(city);
+        if (!weather.error) {
+          contextAddition = `\n[Real-time Weather for ${weather.location}: ${weather.condition}, ${weather.temperature}, Humidity ${weather.humidity}, Wind ${weather.wind}]`;
+        } else {
+          contextAddition = `\n[Note: I tried to fetch weather data but couldn't find details for "${city}".]`;
+        }
       }
 
       const chat = model.startChat({
@@ -128,7 +117,6 @@ exports.chat = onRequest({ cors: true }, (req, res) => {
 
       const result = await chat.sendMessage(messages[messages.length - 1].content + contextAddition);
       const response = await result.response;
-      
       res.json({ response: response.text() });
     } catch (error) {
       console.error("Chatbot Error:", error);
@@ -139,9 +127,6 @@ exports.chat = onRequest({ cors: true }, (req, res) => {
 
 /**
  * HTTP POST /receiveAlert
- * Called by the n8n HTTP Request node.
- * Validates the payload, writes it to Firestore to trigger frontend realtime listeners,
- * and sends out an FCM push notification to all stored tokens.
  */
 exports.receiveAlert = onRequest({ cors: true }, (req, res) => {
   return cors(req, res, async () => {
@@ -155,98 +140,101 @@ exports.receiveAlert = onRequest({ cors: true }, (req, res) => {
       return res.status(400).json({ error: "Missing required fields: risk_level and message." });
     }
 
-  // 1. Build alert object
-  const latestAlert = {
-    alert_type: alert_type || "Flood Alert",
-    risk_level: (risk_level || "LOW").toUpperCase(),
-    message: message || "No details available.",
-    instructions: instructions || "Stay calm and follow local authority guidance.",
-    timestamp: timestamp || new Date().toISOString(),
-    area: area || "Unknown area",
-    sensor_data: sensor_data || null,
-    receivedAt: admin.firestore.FieldValue.serverTimestamp()
-  };
-
-  console.log(`🚨 Alert received: [${latestAlert.risk_level}] ${latestAlert.area}`);
-
-  try {
-    // 2. Save alert to Firestore to trigger real-time updates on Vercel clients
-    await db.collection("alerts").doc("latest").set(latestAlert);
-
-    // 3. Fetch all registered tokens from Firestore
-    const tokensSnapshot = await db.collection("tokens").get();
-    const tokens = [];
-    tokensSnapshot.forEach((doc) => tokens.push(doc.id));
-
-    if (tokens.length === 0) {
-      console.log("ℹ️ No registered devices in Firestore. Skipping FCM push.");
-      return res.json({ success: true, alert: latestAlert, pushSent: false });
-    }
-
-    // 4. Send FCM multicast message
-    const riskLabels = {
-      CRITICAL: "CRITICAL – Evacuate now",
-      HIGH: "HIGH – Take immediate precautions",
-      MEDIUM: "MEDIUM – Stay prepared",
-      LOW: "LOW – Watch situation",
+    // 1. Build alert object
+    const latestAlert = {
+      alert_type: alert_type || "Flood Alert",
+      risk_level: (risk_level || "SAFE").toUpperCase(),
+      message: message || "No details available.",
+      instructions: instructions || "Stay calm and follow local authority guidance.",
+      timestamp: timestamp || new Date().toISOString(),
+      area: area || "Unknown area",
+      sensor_data: sensor_data || null,
+      receivedAt: admin.firestore.FieldValue.serverTimestamp()
     };
 
-    const notificationTitle = `🌊 Flood Alert – ${latestAlert.area}`;
-    const notificationBody = `${riskLabels[latestAlert.risk_level] || latestAlert.risk_level}: ${latestAlert.message}`;
+    console.log(`🚨 Alert received: [${latestAlert.risk_level}] ${latestAlert.area}`);
 
-    const multicastMessage = {
-      tokens: tokens,
-      notification: {
-        title: notificationTitle,
-        body: notificationBody,
-      },
-      data: {
-        risk_level: latestAlert.risk_level,
-        area: latestAlert.area,
-        message: latestAlert.message,
-        timestamp: latestAlert.timestamp,
-      },
-      webpush: {
-        notification: {
-          icon: "/icon.png",
-          badge: "/icon.png",
-          requireInteraction: latestAlert.risk_level === "CRITICAL",
-        },
-      },
-    };
+    try {
+      // 2. Save to Firestore
+      await db.collection("alerts").doc("latest").set(latestAlert);
 
-    const response = await messaging.sendEachForMulticast(multicastMessage);
-    console.log(`📨 FCM sent: ${response.successCount} success, ${response.failureCount} failed.`);
+      // 3. Fetch all registered tokens
+      const tokensSnapshot = await db.collection("tokens").get();
+      const tokens = [];
+      tokensSnapshot.forEach((doc) => tokens.push(doc.id));
 
-    // 5. Cleanup failed tokens from Firestore
-    if (response.failureCount > 0) {
-      const failedTokens = [];
-      response.responses.forEach((resp, idx) => {
-        if (!resp.success) {
-          const errorCode = resp.error?.code;
-          if (
-            errorCode === "messaging/registration-token-not-registered" ||
-            errorCode === "messaging/invalid-registration-token"
-          ) {
-            failedTokens.push(tokens[idx]);
-          }
-        }
-      });
-      
-      if (failedTokens.length > 0) {
-        const batch = db.batch();
-        failedTokens.forEach(token => {
-          batch.delete(db.collection("tokens").doc(token));
-        });
-        await batch.commit();
-        console.log(`🧹 Cleaned up ${failedTokens.length} stale tokens from Firestore.`);
+      if (tokens.length === 0) {
+        console.log("ℹ️ No registered devices. Skipping FCM push.");
+        return res.json({ success: true, alert: latestAlert, pushSent: false });
       }
-    }
 
-    res.json({ success: true, alert: latestAlert, pushSent: true });
-  } catch (error) {
-    console.error("Error processing alert:", error);
-    res.status(500).json({ error: "Failed to process alert." });
-  }
+      // 4. ✅ FIXED — riskLabels now includes SAFE and WARNING
+      const riskLabels = {
+        CRITICAL: "CRITICAL – Evacuate now",
+        WARNING: "WARNING – Take immediate precautions",
+        SAFE: "SAFE – No flood risk",
+      };
+
+      const notificationTitle = `🌊 Flood Alert – ${latestAlert.area}`;
+      const notificationBody = `${riskLabels[latestAlert.risk_level] || latestAlert.risk_level}: ${latestAlert.message}`;
+
+      const multicastMessage = {
+        tokens: tokens,
+        notification: {
+          title: notificationTitle,
+          body: notificationBody,
+        },
+        // ✅ FIXED — data now includes instructions, water_level, flow_rate
+        data: {
+          risk_level: latestAlert.risk_level,
+          area: latestAlert.area,
+          message: latestAlert.message,
+          instructions: latestAlert.instructions,
+          timestamp: latestAlert.timestamp,
+          water_level: latestAlert.sensor_data?.water_level || "",
+          flow_rate: latestAlert.sensor_data?.flow_rate || "",
+        },
+        webpush: {
+          notification: {
+            icon: "/icon.png",
+            badge: "/icon.png",
+            requireInteraction: latestAlert.risk_level === "CRITICAL",
+          },
+        },
+      };
+
+      const response = await messaging.sendEachForMulticast(multicastMessage);
+      console.log(`📨 FCM sent: ${response.successCount} success, ${response.failureCount} failed.`);
+
+      // 5. Cleanup failed tokens
+      if (response.failureCount > 0) {
+        const failedTokens = [];
+        response.responses.forEach((resp, idx) => {
+          if (!resp.success) {
+            const errorCode = resp.error?.code;
+            if (
+              errorCode === "messaging/registration-token-not-registered" ||
+              errorCode === "messaging/invalid-registration-token"
+            ) {
+              failedTokens.push(tokens[idx]);
+            }
+          }
+        });
+
+        if (failedTokens.length > 0) {
+          const batch = db.batch();
+          failedTokens.forEach(token => {
+            batch.delete(db.collection("tokens").doc(token));
+          });
+          await batch.commit();
+          console.log(`🧹 Cleaned up ${failedTokens.length} stale tokens.`);
+        }
+      }
+
+      res.json({ success: true, alert: latestAlert, pushSent: true });
+    } catch (error) {
+      console.error("Error processing alert:", error);
+      res.status(500).json({ error: "Failed to process alert." });
+    }
   });
 });
