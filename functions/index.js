@@ -40,7 +40,7 @@ exports.registerDevice = onRequest({ cors: true }, async (req, res) => {
 const WEATHER_API_KEY = "bc2641ed7eb2c4764c409d838400382b";
 // DO NOT PASTE THIS KEY IN THE AI CHAT — GOOGLE WILL REVOKE IT IF IT SEES IT!
 // Keep it only in this file locally or use .env file.
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AIzaSyA7_STGmzYBl_xCAfjT12qiANyLizQpQeg";
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AIzaSyBr_O5leZdYkCOoqhP4IrwHdEHvfp4WxvA";
 
 /**
  * Helper: Fetch real-time weather from OpenWeatherMap
