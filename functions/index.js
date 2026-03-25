@@ -87,8 +87,8 @@ exports.chat = onRequest({ cors: true }, async (req, res) => {
 
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
-      systemInstruction: "You are a helpful assistant for the Flood Alert App. You provide real-time weather news and details. Be concise, professional, and empathetic, especially when discussing flood risks."
+      model: "gemini-2.5-flash",
+      systemInstruction: "You are a helpful assistant for the Flood Alert App. You provide real-time weather news, flood risk analysis, and safety advice. When the user asks about risk or predictions, analyze the sensor data (flow rate) and current alert status provided in the context to give a meaningful risk assessment. Be concise, professional, and empathetic, especially when discussing flood risks."
     });
 
     const lastMessage = messages[messages.length - 1].content.toLowerCase();
@@ -119,6 +119,46 @@ exports.chat = onRequest({ cors: true }, async (req, res) => {
   } catch (error) {
     console.error("Chatbot Error:", error);
     res.status(500).json({ error: "Sorry, I'm having trouble thinking right now. Please try again later." });
+  }
+});
+
+/**
+ * HTTP GET /forecast
+ */
+exports.forecast = onRequest({ cors: true }, async (req, res) => {
+  const city = req.query.city || "Colombo";
+
+  try {
+    const url = `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(city)}&appid=${WEATHER_API_KEY}&units=metric&cnt=40`;
+    const apiRes = await fetch(url);
+    if (!apiRes.ok) throw new Error("Forecast API error");
+    const data = await apiRes.json();
+
+    // Group by day, take one reading per day (noon)
+    const days = {};
+    data.list.forEach(item => {
+      const date = item.dt_txt.split(" ")[0];
+      const hour = parseInt(item.dt_txt.split(" ")[1].split(":")[0]);
+      if (!days[date] || Math.abs(hour - 12) < Math.abs(parseInt(days[date].dt_txt.split(" ")[1].split(":")[0]) - 12)) {
+        days[date] = item;
+      }
+    });
+
+    const forecast = Object.values(days).slice(0, 5).map(item => {
+      const d = new Date(item.dt_txt);
+      return {
+        day: d.toLocaleDateString("en-US", { weekday: "short" }),
+        temp: Math.round(item.main.temp),
+        description: item.weather[0].description,
+        humidity: item.main.humidity,
+        icon: item.weather[0].icon
+      };
+    });
+
+    res.json({ city: data.city.name, forecast });
+  } catch (error) {
+    console.error("Forecast error:", error);
+    res.status(500).json({ error: "Failed to fetch forecast." });
   }
 });
 

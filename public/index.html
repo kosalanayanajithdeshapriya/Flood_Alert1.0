@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -20,163 +20,292 @@
   <!-- Leaflet CSS for Maps -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
   
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- ─── Header ─────────────────────────────────────────── -->
-  <header class="app-header">
-    <div class="header-inner">
-      <div class="header-brand">
-        <div class="brand-icon">🌊</div>
-        <div>
-          <h1 class="brand-title">Flood Alert App</h1>
-          <p class="brand-subtitle">Flash Flood Early Warning System</p>
-        </div>
+  <!-- ─── Landing Page ────────────────────────────────────── -->
+  <div id="landingPage" class="landing-page">
+    <div class="landing-content">
+      <div class="hero-icon-container">
+        <div class="hero-icon-glow"></div>
+        <div class="hero-icon">🌊</div>
       </div>
-      <div class="header-right">
-        <div class="status-dot" id="statusDot" title="Connection status"></div>
-        <span class="status-label" id="statusLabel">Connecting…</span>
+      
+      <h1 class="hero-title">Flood Alert App</h1>
+      <p class="hero-subtitle">Real-time early warning system for flood emergencies.</p>
+      
+      <div class="hero-badges">
+        <span class="hero-badge">🔔 Live Alerts</span>
+        <span class="hero-badge">🤖 AI Insights</span>
+        <span class="hero-badge">📊 Live Data</span>
       </div>
+      
+      <button class="btn-launch" id="btnLaunch" onclick="launchDashboard()">
+        Launch Dashboard
+      </button>
     </div>
-  </header>
+  </div>
 
-  <!-- ─── Main Content ────────────────────────────────────── -->
-  <main class="main-container">
-
-    <!-- Notification Card -->
-    <section class="card notify-card">
-      <div class="notify-card-content">
-        <div>
-          <h2 class="card-heading">Stay Informed</h2>
-          <p class="card-description">
-            Enable browser notifications so you'll be alerted even when this
-            tab is in the background or closed.
-          </p>
+  <!-- ─── Dashboard View ──────────────────────────────────── -->
+  <div id="dashboardView" class="dashboard-view hidden">
+    <!-- ─── Header ─────────────────────────────────────────── -->
+    <header class="app-header">
+      <div class="header-inner">
+        <div class="header-brand">
+          <div class="brand-icon">🌊</div>
+          <div>
+            <h1 class="brand-title">Flood Alert App</h1>
+            <p class="brand-subtitle">Flash Flood Early Warning System</p>
+          </div>
         </div>
-        <button class="btn-notify" id="btnNotify" onclick="requestNotificationPermission()">
-          <span class="btn-icon">🔔</span>
-          Enable Notifications
-        </button>
-      </div>
-      <p class="notify-note" id="notifyNote"></p>
-    </section>
-
-    <!-- Alert Panel -->
-    <section id="alertPanel" class="alert-panel hidden" role="alert" aria-live="polite">
-      <div class="alert-header" id="alertHeader">
-        <span class="risk-badge" id="riskBadge">CRITICAL</span>
-        <span class="alert-area" id="alertArea">Negombo</span>
-        <span class="alert-timestamp" id="alertTimestamp"></span>
-      </div>
-      <div class="alert-body">
-        <div class="alert-section">
-          <h3 class="alert-label">⚠️ Condition</h3>
-          <p class="alert-message" id="alertMessage"></p>
-        </div>
-        <div class="alert-section instructions-section">
-          <h3 class="alert-label">✅ What To Do Now</h3>
-          <p class="alert-instructions" id="alertInstructions"></p>
+        <div class="header-right">
+          <div class="status-dot" id="statusDot" title="Connection status"></div>
+          <span class="status-label" id="statusLabel">Connecting…</span>
+          <!-- Dark/Light Mode Toggle -->
+          <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+            <span class="theme-icon" id="themeIcon">🌙</span>
+          </button>
         </div>
       </div>
-    </section>
+    </header>
 
-    <!-- Empty State (shown when no alert exists) -->
-    <section id="emptyState" class="empty-state">
-      <div class="empty-icon">✅</div>
-      <h2 class="empty-title">No flood alerts at the moment</h2>
-      <p class="empty-description">
-        You're safe! This panel will update automatically if a flood
-        warning is issued for your area.
-      </p>
-    </section>
+    <!-- ─── Main Content ────────────────────────────────────── -->
+    <main class="main-container">
 
-    <!-- Map & Sensor Dashboard (Hidden until data arrives) -->
-    <section id="dashboardPanel" class="dashboard-panel hidden">
-      <div class="dashboard-grid">
-        <!-- Map Container -->
-        <div class="map-container">
-          <h3 class="dashboard-label">📍 Affected Area Map</h3>
-          <div id="map"></div>
+      <!-- Notification Card -->
+      <section class="card notify-card">
+        <div class="notify-card-content">
+          <div>
+            <h2 class="card-heading">Stay Informed</h2>
+            <p class="card-description">
+              Enable browser notifications so you'll be alerted even when this
+              tab is in the background or closed.
+            </p>
+          </div>
+          <button class="btn-notify" id="btnNotify" onclick="requestNotificationPermission()">
+            <span class="btn-icon">🔔</span>
+            Enable Notifications
+          </button>
         </div>
+        <p class="notify-note" id="notifyNote"></p>
+      </section>
 
-        <!-- Sensor Data -->
-        <div class="sensor-container">
-          <h3 class="dashboard-label">
-            📊 Live Sensor Data
-            <span class="live-indicator"></span>
-          </h3>
-          <div class="sensor-grid">
-            <div class="sensor-card animate-stagger-1">
-              <span class="sensor-icon">💧</span>
-              <div class="sensor-info">
-                <span class="sensor-title">Water Level</span>
-                <span class="sensor-value" id="waterLevelVal">--</span>
+      <!-- Alert Panel -->
+      <section id="alertPanel" class="alert-panel hidden" role="alert" aria-live="polite">
+        <div class="alert-header" id="alertHeader">
+          <span class="risk-badge" id="riskBadge">CRITICAL</span>
+          <span class="alert-area" id="alertArea">Negombo</span>
+          <span class="alert-timestamp" id="alertTimestamp"></span>
+        </div>
+        <div class="alert-body">
+          <div class="alert-section">
+            <h3 class="alert-label">⚠️ Condition</h3>
+            <p class="alert-message" id="alertMessage"></p>
+          </div>
+          <div class="alert-section instructions-section">
+            <h3 class="alert-label">✅ What To Do Now</h3>
+            <p class="alert-instructions" id="alertInstructions"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Empty State (shown when no alert exists) -->
+      <section id="emptyState" class="empty-state">
+        <div class="empty-icon">✅</div>
+        <h2 class="empty-title">No flood alerts at the moment</h2>
+        <p class="empty-description">
+          You're safe! This panel will update automatically if a flood
+          warning is issued for your area.
+        </p>
+      </section>
+
+      <!-- Map & Sensor Dashboard (Hidden until data arrives) -->
+      <section id="dashboardPanel" class="dashboard-panel hidden">
+        <div class="dashboard-grid">
+          <!-- Map Container -->
+          <div class="map-container">
+            <h3 class="dashboard-label">
+              📍 Affected Area Map
+              <button class="btn-locate" id="btnLocate" onclick="detectUserLocation()" title="Show my location">
+                📌 My Location
+              </button>
+            </h3>
+            <div id="map"></div>
+            <p class="distance-info hidden" id="distanceInfo"></p>
+          </div>
+
+          <!-- Sensor Data -->
+          <div class="sensor-container">
+            <h3 class="dashboard-label">
+              📊 Live Sensor Data
+              <span class="live-indicator"></span>
+            </h3>
+            <div class="sensor-grid">
+              
+              <div class="sensor-card animate-stagger-2">
+                <span class="sensor-icon">🌊</span>
+                <div class="sensor-info">
+                  <span class="sensor-title">Flow Rate</span>
+                  <span class="sensor-value" id="flowRateVal">--</span>
+                </div>
               </div>
-            </div>
-            <div class="sensor-card animate-stagger-2">
-              <span class="sensor-icon">🌊</span>
-              <div class="sensor-info">
-                <span class="sensor-title">Flow Rate</span>
-                <span class="sensor-value" id="flowRateVal">--</span>
-              </div>
-            </div>
-            <div class="sensor-card emergency-card animate-stagger-3">
-              <span class="sensor-icon">📞</span>
-              <div class="sensor-info">
-                <span class="sensor-title">Emergency Contacts</span>
-                <span class="sensor-value emergency-numbers">
-                  Police: 119<br>
-                  Ambulance: 1990<br>
-                  Disaster Center: 117
-                </span>
+              <div class="sensor-card emergency-card animate-stagger-3">
+                <span class="sensor-icon">📞</span>
+                <div class="sensor-info">
+                  <span class="sensor-title">Emergency Contacts</span>
+                  <span class="sensor-value emergency-numbers">
+                    <a href="tel:112" class="emergency-link">🚨 Emergency: 112</a>
+                    <a href="tel:117" class="emergency-link">🏛️ Disaster Center: 117</a>
+                    <a href="tel:119" class="emergency-link">🚔 Police: 119</a>
+                    <a href="tel:110" class="emergency-link">🚒 Fire: 110</a>
+                    <a href="tel:1990" class="emergency-link">🚑 Ambulance: 1990</a>
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
+      </section>
+
+      <!-- Sensor Data Charts -->
+      <section id="chartsPanel" class="card hidden">
+        <h3 class="dashboard-label">📈 Sensor Data Trends</h3>
+        <div class="charts-grid">
+          <div class="chart-container solo-chart">
+            <canvas id="flowRateChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Weather Forecast Widget -->
+      <section id="forecastPanel" class="card hidden">
+        <h3 class="dashboard-label">🌦️ 5-Day Weather Forecast</h3>
+        <div class="forecast-grid" id="forecastGrid">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- Alert History Timeline -->
+      <section id="historyPanel" class="card">
+        <div class="history-header">
+          <h3 class="dashboard-label">📜 Alert History</h3>
+          <button class="btn-clear-history" id="btnClearHistory" onclick="clearAlertHistory()">Clear</button>
+        </div>
+        <div class="history-timeline" id="historyTimeline">
+          <p class="history-empty">No past alerts recorded yet.</p>
+        </div>
+      </section>
+
+      <!-- Safety Checklist -->
+      <section class="card safety-checklist-card">
+        <h3 class="dashboard-label">🛡️ Emergency Preparedness Checklist</h3>
+        <p class="checklist-description">Track your flood readiness. Progress is saved automatically.</p>
+        <div class="checklist-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" id="checklistProgress"></div>
+          </div>
+          <span class="progress-text" id="checklistProgressText">0%</span>
+        </div>
+        <ul class="checklist" id="safetyChecklist">
+          <li><label><input type="checkbox" data-item="water" onchange="updateChecklist()"> Store 3 days of drinking water</label></li>
+          <li><label><input type="checkbox" data-item="food" onchange="updateChecklist()"> Prepare non-perishable food supplies</label></li>
+          <li><label><input type="checkbox" data-item="kit" onchange="updateChecklist()"> Assemble a first aid kit</label></li>
+          <li><label><input type="checkbox" data-item="docs" onchange="updateChecklist()"> Secure important documents in waterproof bag</label></li>
+          <li><label><input type="checkbox" data-item="phone" onchange="updateChecklist()"> Charge phones & portable power banks</label></li>
+          <li><label><input type="checkbox" data-item="route" onchange="updateChecklist()"> Know your evacuation route</label></li>
+          <li><label><input type="checkbox" data-item="contacts" onchange="updateChecklist()"> Save emergency contact numbers</label></li>
+          <li><label><input type="checkbox" data-item="flashlight" onchange="updateChecklist()"> Prepare flashlights & batteries</label></li>
+          <li><label><input type="checkbox" data-item="clothing" onchange="updateChecklist()"> Pack waterproof clothing & sturdy shoes</label></li>
+          <li><label><input type="checkbox" data-item="plan" onchange="updateChecklist()"> Discuss family emergency plan</label></li>
+        </ul>
+      </section>
+
+      <!-- Report Flooding Button -->
+      <section class="card report-card">
+        <div class="report-card-content">
+          <div>
+            <h3 class="dashboard-label">🚨 Report Flooding</h3>
+            <p class="card-description">See flooding in your area? Help your community by reporting it.</p>
+          </div>
+          <button class="btn-report" id="btnReport" onclick="openReportModal()">
+            📝 Report Now
+          </button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ─── Report Flooding Modal ───────────────────────────── -->
+    <div class="modal-overlay hidden" id="reportModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>🚨 Report Flooding</h3>
+          <button class="modal-close" onclick="closeReportModal()">✕</button>
+        </div>
+        <form id="reportForm" onsubmit="submitReport(event)">
+          <div class="form-group">
+            <label for="reportArea">Area / Location</label>
+            <input type="text" id="reportArea" placeholder="e.g. Kelaniya, near the bridge" required />
+          </div>
+          <div class="form-group">
+            <label for="reportSeverity">Severity</label>
+            <select id="reportSeverity" required>
+              <option value="">Select severity...</option>
+              <option value="low">🟢 Low – Minor water accumulation</option>
+              <option value="medium">🟡 Medium – Road flooding</option>
+              <option value="high">🔴 High – Severe flooding, danger to life</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="reportDescription">Description</label>
+            <textarea id="reportDescription" rows="3" placeholder="Describe the flooding situation..."></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" onclick="closeReportModal()">Cancel</button>
+            <button type="submit" class="btn-submit" id="btnSubmitReport">Submit Report</button>
+          </div>
+          <p class="report-status" id="reportStatus"></p>
+        </form>
       </div>
-    </section>
+    </div>
 
-  </main>
+    <!-- ─── Footer ─────────────────────────────────────────── -->
+    <footer class="app-footer">
+      <p>Powered by Firebase Cloud Messaging &amp; n8n automation &nbsp;•&nbsp; Data updates in real time</p>
+    </footer>
 
-  <!-- ─── Footer ─────────────────────────────────────────── -->
-  <footer class="app-footer">
-    <p>Powered by Firebase Cloud Messaging &amp; n8n automation &nbsp;•&nbsp; Data updates in real time</p>
-  </footer>
+    <!-- ─── AI Chatbot UI ────────────────────────────────────── -->
+    <button class="chat-fab" id="chatFab" onclick="toggleChat()" title="Ask our AI Assistant">
+      <span class="fab-icon">🤖</span>
+      <span class="fab-badge"></span>
+    </button>
 
-  <!-- ─── Firebase JS SDK (CDN) ───────────────────────────── -->
-  <!--
-    ✏️  These are loaded from the Firebase CDN.
-        You do NOT need to change anything here —
-        your config goes inside main.js.
-  -->
-  <!-- ─── AI Chatbot UI ────────────────────────────────────── -->
-  <button class="chat-fab" id="chatFab" onclick="toggleChat()" title="Ask our AI Assistant">
-    <span class="fab-icon">🤖</span>
-    <span class="fab-badge"></span>
-  </button>
-
-  <div class="chat-window hidden" id="chatWindow">
-    <div class="chat-header">
-      <div class="chat-header-info">
-        <span class="chat-header-icon">🤖</span>
-        <div>
-          <h4 class="chat-header-title">AI Assistant</h4>
-          <span class="chat-header-status">Online • Weather Expert</span>
+    <div class="chat-window hidden" id="chatWindow">
+      <div class="chat-header">
+        <div class="chat-header-info">
+          <span class="chat-header-icon">🤖</span>
+          <div>
+            <h4 class="chat-header-title">AI Assistant</h4>
+            <span class="chat-header-status">Online • Weather Expert</span>
+          </div>
+        </div>
+        <button class="chat-close" onclick="toggleChat()">✕</button>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="message assistant">
+          Hi there! I'm your AI weather assistant. Need help with the latest weather developments or flood risks? Just ask!
         </div>
       </div>
-      <button class="chat-close" onclick="toggleChat()">✕</button>
-    </div>
-    <div class="chat-messages" id="chatMessages">
-      <div class="message assistant">
-        Hi there! I'm your AI weather assistant. Need help with the latest weather developments or flood risks? Just ask!
+      <div class="chat-input-container">
+        <input type="text" id="chatInput" placeholder="Type a message..." autocomplete="off">
+        <button class="chat-send" id="chatSend" onclick="sendMessage()">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
       </div>
-    </div>
-    <div class="chat-input-container">
-      <input type="text" id="chatInput" placeholder="Type a message..." autocomplete="off">
-      <button class="chat-send" id="chatSend" onclick="sendMessage()">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-      </button>
     </div>
   </div>
 
