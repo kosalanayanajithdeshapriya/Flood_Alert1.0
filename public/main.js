@@ -781,8 +781,6 @@ window.launchDashboard = function() {
     if (typeof map !== 'undefined' && map) {
       setTimeout(() => map.invalidateSize(), 150);
     }
-    // Save to session so it doesn't show on refresh
-    sessionStorage.setItem("visited", "true");
   }, 800);
 };
 
@@ -793,17 +791,6 @@ function bootApp() {
   renderHistory();
   initCharts();
   connectFirestoreAlerts();
-}
-
-// Initial state check
-if (sessionStorage.getItem("visited") === "true") {
-  const $lp = document.getElementById("landingPage");
-  const $dv = document.getElementById("dashboardView");
-  if ($lp) $lp.classList.add("hidden");
-  if ($dv) {
-    $dv.classList.remove("hidden");
-    $dv.classList.add("visible");
-  }
 }
 
 bootApp();
