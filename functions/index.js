@@ -180,7 +180,8 @@ exports.receiveAlert = onRequest({ cors: true }, async (req, res) => {
   const latestAlert = {
     alert_type: alert_type || "Flood Alert",
     risk_level: (risk_level || "SAFE").toUpperCase(),
-    message: message || "No details available.",
+    // Strip out "Level: ...m" from the message if present
+    message: (message || "No details available.").replace(/Level:\s*[\d.]+m,?\s*/gi, ""),
     instructions: instructions || "Stay calm and follow local authority guidance.",
     timestamp: timestamp || new Date().toISOString(),
     area: area || "Unknown area",

@@ -508,7 +508,7 @@ function populateAlertPanel(alert, risk, meta) {
   $ap.className = "alert-panel " + meta.cssClass;
   $riskBadge.textContent = meta.label;
   $alertArea.textContent = alert.area || "Unknown area";
-  $alertMessage.textContent = alert.message || "No further details available.";
+  $alertMessage.textContent = (alert.message || "No further details available.").replace(/Level:\s*[\d.]+m,?\s*/gi, "");
   $alertInstructions.textContent = alert.instructions || "Follow guidance from local authorities.";
 
   if (alert.timestamp) {
