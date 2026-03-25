@@ -38,7 +38,9 @@ exports.registerDevice = onRequest({ cors: true }, async (req, res) => {
 
 // ─── Constants & API Keys ──────────────────────────────────
 const WEATHER_API_KEY = "bc2641ed7eb2c4764c409d838400382b";
-const GEMINI_API_KEY = "AIzaSyCXpFrz9KUoegDaXv6gXT96-kcFyIImrvY";
+// DO NOT PASTE THIS KEY IN THE AI CHAT — GOOGLE WILL REVOKE IT IF IT SEES IT!
+// Keep it only in this file locally or use .env file.
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AIzaSyA7_STGmzYBl_xCAfjT12qiANyLizQpQeg";
 
 /**
  * Helper: Fetch real-time weather from OpenWeatherMap
@@ -77,15 +79,15 @@ exports.chat = onRequest({ cors: true }, async (req, res) => {
   }
 
   try {
-    if (GEMINI_API_KEY === "YOUR_GEMINI_API_KEY") {
+    if (GEMINI_API_KEY === "YOUR_GEMINI_API_KEY" || GEMINI_API_KEY === "PLACE_YOUR_NEW_API_KEY_HERE" || !GEMINI_API_KEY) {
       return res.json({
-        response: "The AI Chatbot is almost ready! Please set your GEMINI_API_KEY in the backend to start chatting."
+        response: "The AI Chatbot is almost ready! Please set your GEMINI_API_KEY in the backend (functions/index.js) or as an environment variable to start chatting."
       });
     }
 
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: "gemini-1.5-flash",
       systemInstruction: "You are a helpful assistant for the Flood Alert App. You provide real-time weather news and details. Be concise, professional, and empathetic, especially when discussing flood risks."
     });
 
