@@ -66,7 +66,8 @@ n8n HTTP Request Node
 ---
 
 ## 🔗 Connecting n8n
-<img width="1230" height="741" alt="image" src="https://github.com/user-attachments/assets/9ce8f445-c306-47ed-80ee-e08d8d9bca7c" />
+<img width="1499" height="699" alt="image" src="https://github.com/user-attachments/assets/3fd4157a-b764-48d7-9df8-4b2976876cc6" />
+
 
 In your n8n workflow, add an **HTTP Request** node configured as:
 
