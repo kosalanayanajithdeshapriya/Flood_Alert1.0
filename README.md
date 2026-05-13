@@ -13,6 +13,68 @@ This application is built with a **Serverless** architecture to be hosted on Ver
 ![WhatsApp Image 2026-03-20 at 10 26 08 AM](https://github.com/user-attachments/assets/a31e7af8-abe5-4ede-afad-0e18eed4272d)
 
 
+The **0.3m distance from the floor to the sensor** is chosen for three specific practical reasons:
+
+***
+
+## 1. 🟤 Avoid the Silt Layer
+
+```
+         WATER SURFACE
+         ══════════════════════════
+
+              [YF-S201 Sensor] ← 0.3m above floor
+         ──────────────────────────  ← 0.3m mark
+         ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  ← Silt/mud/debris layer
+         ▓▓▓▓ RIVER FLOOR ▓▓▓▓▓▓▓▓▓
+```
+
+River floors accumulate **mud, sand, silt, and debris** over time. If the sensor is placed directly at floor level:
+- Mud enters the pipe and **jams the turbine permanently**
+- Debris blocks the pipe inlet completely
+- No readings are possible at all
+
+At 0.3m, the sensor sits **above the silt layer** but still deep enough to be always submerged.
+
+***
+
+## 2. 💧 Always Stay Submerged
+
+The Kelaniya River's **dry season depth is 1.5 – 2.5 metres**. At 0.3m above the floor: [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/73715436/60c305c3-32e6-4b5c-b270-c54c497462bd/FlashGuard_Report-1.docx)
+
+```
+   Normal water depth = 1.5m minimum
+   Sensor position    = 0.3m above floor
+
+   Water above sensor = 1.5 - 0.3 = 1.2m of water
+                                     always covering it
+```
+
+The sensor stays **fully underwater at all times** — even during the driest season — so it never loses contact with the water and always gives readings.
+
+***
+
+## 3. 🌊 Best Flow Velocity Zone
+
+River water velocity is **not uniform** from top to bottom:
+
+```
+   SURFACE     → Slow (wind friction, surface turbulence)
+   ─────────────────────────────────────────
+   MID DEPTH   → Fastest flow zone
+   ─────────────────────────────────────────
+   0.3m ABOVE  → Good strong flow, accurate readings ✅
+   FLOOR
+   ─────────────────────────────────────────
+   FLOOR       → Very slow (friction with river bed)
+```
+
+At 0.3m the sensor captures **representative, strong flow velocity** — not the slow boundary layer right at the floor, and not the turbulent surface layer.
+
+***
+
+
+> 0.3m is chosen because it is **above the silt that clogs the turbine**, **below the minimum dry-season water level so it is always submerged**, and **in the zone of good measurable flow velocity** — making it the optimal position for accurate and reliable readings year-round. ✅
 ```
 n8n HTTP Request Node
         │  POST /receiveAlert (Firebase Function)
